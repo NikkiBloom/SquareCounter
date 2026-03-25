@@ -13,8 +13,14 @@ import kotlin.math.min
 class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context, attributeSet){
 
     // holds the grid
-    val grid = Array(9) { IntArray(9) { 0 } }
+    val grid = Array(8) { IntArray(8) { 0 } }
 
+    init { // initiate with starting positions, 4 tiles in the center of the screen
+        grid[3][3] = 1
+        grid[3][4] = 2
+        grid[4][3] = 2
+        grid[4][4] = 1
+    }
     var size = 0f
     var cellSize = 0f
     var offsetX = 0f
@@ -23,7 +29,7 @@ class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context,
     // shared values to center the grid
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         size = min(w, h).toFloat()
-        cellSize = size / 9f
+        cellSize = size / 8f
         offsetX = (w - size) / 2f
         offsetY = (h - size) / 2f
     }
@@ -64,30 +70,31 @@ class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context,
         super.onDraw(canvas)
 
         // text
-        for (row in 0..8){
-            for (col in 0..8){
-                val text = grid[row][col].toString()
-
+        for (row in 0..7){
+            for (col in 0..7){
                 // cell
                 val left = offsetX + col * cellSize
                 val top = offsetY + row * cellSize
                 val right = left + cellSize
                 val bottom = top + cellSize
-                fillPaint.color = cellColor(grid[row][col])
+                fillPaint.color = Color.rgb(37, 117, 23)
                 canvas.drawRect(left, top, right, bottom, fillPaint)
 
-                // text
-                textPaint.textSize = cellSize * 0.8f
-                textPaint.isFakeBoldText = true
-
-                val x = offsetX + col * cellSize + cellSize / 2
-                val y = offsetY + row * cellSize + cellSize / 2 - (textPaint.descent() + textPaint.ascent()) / 2
-                canvas.drawText(text, x, y, textPaint)
+                // draw tile if applicable
+                if (grid[row][col] == 0){} // empty cell
+                else if (grid[row][col] == 1) { // black tile
+                    fillPaint.color = Color.BLACK
+                    canvas.drawCircle(left+(cellSize/2), top+(cellSize/2), (cellSize/2-3), fillPaint)
+                }
+                else if (grid[row][col] == 2){ // white tile
+                    fillPaint.color = Color.WHITE
+                    canvas.drawCircle(left+(cellSize/2), top+(cellSize/2), (cellSize/2-3), fillPaint)
+                }
             }
         }
 
         // lines
-        for (i in 0..9) {
+        for (i in 0..7) {
             val posX = offsetX + i * cellSize
             val posY = offsetY + i * cellSize
 
@@ -101,20 +108,18 @@ class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context,
 
         if (event.action == MotionEvent.ACTION_DOWN) {
             val size = min(width, height)
-            val cellSize = size / 9
+            val cellSize = size / 8
 
             // relate touch position to grid position
             val col = ((event.x - offsetX) / cellSize).toInt()
             val row = ((event.y - offsetY) / cellSize).toInt()
 
             // re-trigger the draw
-            if (col in 0..8 && row in 0..8) {
-                grid[row][col] = (grid[row][col] + 1) % 10
+            if (col in 0..7 && row in 0..7) {
+                grid[row][col] = (grid[row][col] + 1) % 3
                 invalidate()
             }
         }
         return true
     }
-
-
 }
