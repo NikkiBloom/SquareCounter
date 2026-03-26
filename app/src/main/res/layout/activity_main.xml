@@ -3,9 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.squarecounter.ui.theme.GridCounter
+    <com.example.squarecounter.ui.theme.BoardView
         android:id="@+id/gridCounter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1" />
+
+    <com.example.squarecounter.ui.theme.BoardView
+        android:id="@+id/boardView"
+        android:layout_width="577dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
 </LinearLayout>

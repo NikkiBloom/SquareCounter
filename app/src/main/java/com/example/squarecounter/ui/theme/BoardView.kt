@@ -6,21 +6,14 @@ import android.view.MotionEvent
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Color
-import android.graphics.Rect
 import android.view.View
 import kotlin.math.min
 
-class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context, attributeSet){
+class BoardView(context: Context, attributeSet: AttributeSet?) : View(context, attributeSet){
 
-    // holds the grid
-    val grid = Array(8) { IntArray(8) { 0 } }
+    // reference for the game state
+    var board: Othello? = null
 
-    init { // initiate with starting positions, 4 tiles in the center of the screen
-        grid[3][3] = 1
-        grid[3][4] = 2
-        grid[4][3] = 2
-        grid[4][4] = 1
-    }
     var size = 0f
     var cellSize = 0f
     var offsetX = 0f
@@ -45,23 +38,6 @@ class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context,
         color = Color.GRAY
     }
 
-    private fun cellColor(value: Int): Int {
-        // handpicked on https://rgbcolorpicker.com
-        return when (value) {
-            0 -> Color.WHITE                                   // white
-            1 -> Color.rgb(128, 255, 132) // green
-            2 -> Color.rgb(158, 255, 128)
-            3 -> Color.rgb(189, 255, 128)
-            4 -> Color.rgb(217, 255, 128)
-            5 -> Color.rgb(246, 255, 128) // yellow
-            6 -> Color.rgb(255, 226, 128)
-            7 -> Color.rgb(255, 192, 128)
-            8 -> Color.rgb(255, 167, 128)
-            9 -> Color.rgb(255, 128, 128) // red
-            else -> Color.WHITE
-        }
-    }
-
     private val fillPaint = Paint().apply { style = Paint.Style.FILL }
 
 
@@ -81,12 +57,13 @@ class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context,
                 canvas.drawRect(left, top, right, bottom, fillPaint)
 
                 // draw tile if applicable
-                if (grid[row][col] == 0){} // empty cell
-                else if (grid[row][col] == 1) { // black tile
+                val state = board?.getCellState(row, col)
+                if (state == 0){} // empty cell
+                else if (state == 1) { // black tile
                     fillPaint.color = Color.BLACK
                     canvas.drawCircle(left+(cellSize/2), top+(cellSize/2), (cellSize/2-3), fillPaint)
                 }
-                else if (grid[row][col] == 2){ // white tile
+                else if (state == 2){ // white tile
                     fillPaint.color = Color.WHITE
                     canvas.drawCircle(left+(cellSize/2), top+(cellSize/2), (cellSize/2-3), fillPaint)
                 }
@@ -116,7 +93,7 @@ class GridCounter(context: Context, attributeSet: AttributeSet?) : View(context,
 
             // re-trigger the draw
             if (col in 0..7 && row in 0..7) {
-                grid[row][col] = (grid[row][col] + 1) % 3
+                // grid[row][col] = (grid[row][col] + 1) % 3 // handled by game class
                 invalidate()
             }
         }
